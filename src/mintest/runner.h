@@ -20,11 +20,10 @@
 
 int timeout = 0;
 int child_done = 0;
-
-int num_vezes = 0;
-void sig_handler(int num) {
-    printf("Chamou Ctrl+C: %d\n", num_vezes);
-    if (num_vezes == 3) {
+int num_vezes = 1;
+void sig_handler() {
+    printf("Voce tem certeza que deseja finalizar o programa \n precione a segunda vez control-c:%d\n", num_vezes);
+    if (num_vezes == 2) {
         struct sigaction s;
         s.sa_handler = SIG_DFL;
         sigemptyset(&s.sa_mask);
@@ -34,14 +33,8 @@ void sig_handler(int num) {
     num_vezes++;
 }
 int main() {
-    
     int status_filho;
     int size = sizeof(all_tests)/sizeof(test_data);
-    struct sigaction s;
-    s.sa_handler = sig_handler;
-    sigemptyset(&s.sa_mask);
-    s.sa_flags = 0;
-    sigaction(SIGINT, &s, NULL);
     
     pid_t pid[size];
     printf("Running %d tests:\n", size);
@@ -61,6 +54,11 @@ int main() {
             
         }
     }
+    struct sigaction s;
+    s.sa_handler = sig_handler;
+    sigemptyset(&s.sa_mask);
+    s.sa_flags = 0;
+    sigaction(SIGINT, &s, NULL);
     for (int i=0; i<size; i++) 
     { 
         waitpid(pid[i], &status_filho, WUNTRACED); 
